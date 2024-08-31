@@ -1,42 +1,42 @@
 class Solution {
-    public double maxProbability(int n, int[][] edges, double[] succProb, int start, int end) {
-        List<List<Node>> graph = new ArrayList<>();
-        for (int i = 0; i < n; i++) {
-            graph.add(new ArrayList<>());
-        }
-        for (int i = 0; i < edges.length; i++) {
-            int u = edges[i][0], v = edges[i][1];
-            double prob = succProb[i];
-            graph.get(u).add(new Node(v, prob));
-            graph.get(v).add(new Node(u, prob));
-        }
-        double[] maxProb = new double[n];
-        maxProb[start] = 1.0;
-        PriorityQueue<Node> pq = new PriorityQueue<>((a, b) -> Double.compare(b.prob, a.prob));
-        pq.add(new Node(start, 1.0));
-        while (!pq.isEmpty()) {
-            Node curr = pq.poll();
-            int u = curr.node;
-            double prob = curr.prob;
-            if (u == end) return prob;
-            for (Node neighbor : graph.get(u)) {
-                int v = neighbor.node;
-                double newProb = prob * neighbor.prob;
-                if (newProb > maxProb[v]) {
-                    maxProb[v] = newProb;
-                    pq.add(new Node(v, newProb));
-                }
-            }
-        }
-        return 0.0;
+    public double maxProbability(int n, int[][] edges, double[] succProb, int start, int end)  {
+    // {a: [(b, probability_ab)]}
+    List<Pair<Integer, Double>>[] graph = new List[n];
+    // (the probability to reach u, u)
+    Queue<Pair<Double, Integer>> maxHeap =
+        new PriorityQueue<>((a, b) -> Double.compare(b.getKey(), a.getKey()));
+
+    maxHeap.offer(new Pair<>(1.0, start));
+    boolean[] seen = new boolean[n];
+
+    for (int i = 0; i < n; ++i)
+      graph[i] = new ArrayList<>();
+
+    for (int i = 0; i < edges.length; ++i) {
+      final int u = edges[i][0];
+      final int v = edges[i][1];
+      final double prob = succProb[i];
+      graph[u].add(new Pair<>(v, prob));
+      graph[v].add(new Pair<>(u, prob));
     }
-    class Node {
-        int node;
-        double prob;
-        Node(int node, double prob) {
-            this.node = node;
-            this.prob = prob;
-        }
-        
+
+    while (!maxHeap.isEmpty()) {
+      final double prob = maxHeap.peek().getKey();
+      final int u = maxHeap.poll().getValue();
+      if (u == end)
+        return prob;
+      if (seen[u])
+        continue;
+      seen[u] = true;
+      for (Pair<Integer, Double> node : graph[u]) {
+        final int nextNode = node.getKey();
+        final double edgeProb = node.getValue();
+        if (seen[nextNode])
+          continue;
+        maxHeap.add(new Pair<>(prob * edgeProb, nextNode));
+      }
+    }
+
+    return 0;
     }
 }
