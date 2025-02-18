@@ -1,17 +1,22 @@
 class Solution {
     public String smallestNumber(String pattern) {
-         int n = pattern.length();
-        StringBuilder result = new StringBuilder();
-        Stack<Integer> stack = new Stack<>();
-
-        for (int i = 0; i <= n; i++) {
-            stack.push(i + 1);
-            if (i == n || pattern.charAt(i) == 'I') {
-                while (!stack.isEmpty()) {
-                    result.append(stack.pop());
-                }
+        int n = pattern.length();
+        char[] ans = new char[n+1];
+        for (int i=0; i<=n; i++){
+            ans[i] = ((i+1) + "").charAt(0);
+        }
+        for (int i=0; i<n; i++){
+            int j=i;
+            while(j>=0 && pattern.charAt(j) == 'D'){
+                swap(ans,j,j+1);
+                j--;
             }
         }
-        return result.toString();
+        return String.valueOf(ans);
+    }
+    private static void swap(char[]arr, int i , int j){
+        char temp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = temp;
     }
 }
