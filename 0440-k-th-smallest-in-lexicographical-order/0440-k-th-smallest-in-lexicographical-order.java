@@ -1,26 +1,33 @@
 class Solution {
-    private int getReqNum(long a, long b, long n) {
-        int gap = 0;
-        while (a <= n) {
-            gap += Math.min(n + 1, b) - a;
-            a *= 10;
-            b *= 10;
-        }
-        return gap;
-    }
-
     public int findKthNumber(int n, int k) {
-        long num = 1;
-        for (int i = 1; i < k;) {
-            int req = getReqNum(num, num + 1, n);
-            if (i + req <= k) {
-                i += req;
-                num++;
+        long curr = 1;
+        k -= 1; // we already include 1 in our result
+
+        while (k > 0) {
+            long count = getCount(curr, n);
+            if (count <= k) {
+                // skip current prefix subtree
+                curr++;
+                k -= count;
             } else {
-                i++;
-                num *= 10;
+                // go deeper in the tree
+                curr *= 10;
+                k -= 1;
             }
         }
-        return (int) num;
+        return (int) curr;
+    }
+
+    private long getCount(long prefix, long n) {
+        long count = 0;
+        long current = prefix;
+        long next = prefix + 1;
+
+        while (current <= n) {
+            count += Math.min(n + 1, next) - current;
+            current *= 10;
+            next *= 10;
+        }
+        return count;
     }
 }
